@@ -1,6 +1,6 @@
 const express = require("express");
 
-const HubsRouter = require("./hubs-router");
+const HubsRouter = require("./hubs/hubs-router");
 
 const server = express();
 

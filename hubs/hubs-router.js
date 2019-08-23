@@ -3,9 +3,10 @@ const express = require("express");
 const router = express.Router();
 
 // willl work with /api/hubs
-const Hubs = require("./hubs/hubs-model.js");
+const Hubs = require("./hubs-model");
 
 router.get("/", (req, res) => {
+  console.log("Query", req.query);
   Hubs.find(req.query)
     .then(hubs => {
       res.status(200).json(hubs);
@@ -86,6 +87,38 @@ router.put("/:id", (req, res) => {
         message: "Error updating the hub"
       });
     });
+});
+
+router.get("/:id/messages", (req, res) => {
+  const { id } = req.params;
+  Hubs.findHubMessages()
+    .then(results => {
+      if (id) {
+        res.status(200).json({
+          results
+        });
+      } else {
+        res.status(404).json({
+          error: "Not Hub Found"
+        });
+      }
+    })
+    .catch(error => {
+      res.status(500).json({
+        error
+      });
+    });
+});
+
+router.post("/:id/messages", async (req, res) => {
+  const messageInfo = { ...req.body, hub_id: req.params.id };
+
+  try {
+    const savedMessage = await Hubs.addMessage(messageInfo);
+    res.status(201).json(savedMessage);
+  } catch (error) {
+    res.status(500).json(error);
+  }
 });
 
 module.exports = router;
